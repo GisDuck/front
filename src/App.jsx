@@ -72,8 +72,25 @@ function App ()
 
     return (
         <div id="app">
+
+            <header>
+                {/*
+                    Тут будет верхняя менюшка
+                */}
+            </header>
+
+            <aside>
+                {/* 
+                    Тут будет боковая менюшка 
+                */}
+            </aside>
+
             <FarmGame ref={phaserRef} currentActiveScene={currentScene} />
-            {/* <div className="uiPanel">
+
+            
+            {/* Пример для себя 
+            
+            <div className="uiPanel">
                 <div>
                     <button className="button" onClick={changeScene}>Change Scene</button>
                 </div>
