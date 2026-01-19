@@ -29,6 +29,8 @@ export class Preloader extends Scene {
         this.load.image('brain', 'brain.png');
         this.load.image('house', 'house.png');
         this.load.image('border', 'border.png');
+        this.load.image('field', 'field.png');
+        this.load.image('simpleHouse', 'simpleHouse.png');
 
         this.load.spritesheet('housAnims', 'housAnims.png', {
             frameWidth: 300,

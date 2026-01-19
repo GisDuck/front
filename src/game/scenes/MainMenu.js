@@ -44,7 +44,7 @@ export class MainMenu extends Scene {
                 .setInteractive({ useHandCursor: true });
 
             startText.on('pointerup', () => {
-                this.scene.start('SignIn');
+                this.scene.start('Game');
             });
         });
 
