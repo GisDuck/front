@@ -7,6 +7,7 @@ export class Game extends Scene {
     }
 
     create() {
+        EventBus.emit('current-scene-ready', this);
         const pw = (p) => this.scale.width * p / 100;
         const ph = (p) => this.scale.height * p / 100;
 

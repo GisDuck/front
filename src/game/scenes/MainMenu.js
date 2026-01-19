@@ -9,6 +9,7 @@ export class MainMenu extends Scene {
     }
 
     create() {
+        EventBus.emit('current-scene-ready', this);
 
         const pw = (p) => this.scale.width * p / 100;
         const ph = (p) => this.scale.height * p / 100;
@@ -43,7 +44,7 @@ export class MainMenu extends Scene {
                 .setInteractive({ useHandCursor: true });
 
             startText.on('pointerup', () => {
-                this.scene.start('Game');
+                this.scene.start('SignIn');
             });
         });
 

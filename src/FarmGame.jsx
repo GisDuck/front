@@ -31,24 +31,20 @@ export const FarmGame = forwardRef(function FarmGame ({ currentActiveScene }, re
     }, [ref]);
 
     useEffect(() => {
-
-        EventBus.on('current-scene-ready', (currentScene) => {
-
-            if (currentActiveScene instanceof Function)
-            {
+        const handler = (currentScene) => {
+            if (currentActiveScene instanceof Function) {
                 currentActiveScene(currentScene);
             }
             ref.current.scene = currentScene;
-            
-        });
-
+        };
+    
+        EventBus.on('current-scene-ready', handler);
+    
         return () => {
-
-            EventBus.removeListener('current-scene-ready');
-
-        }
-        
-    }, [currentActiveScene, ref])
+            EventBus.off('current-scene-ready', handler);
+        };
+    }, [currentActiveScene, ref]);
+    
 
     return (
         <div id="game-container"></div>

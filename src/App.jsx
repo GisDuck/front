@@ -8,6 +8,7 @@ function App() {
     const [canMoveSprite, setCanMoveSprite] = useState(true);
     const phaserRef = useRef();
     const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
+    const [showHeader, setShowHeader] = useState(true);
     
     const [showSidebar, setShowSidebar] = useState(false);
 
@@ -39,10 +40,11 @@ function App() {
 
     const currentScene = (scene) => {
         const key = scene.scene.key;
+    
         setCanMoveSprite(key !== 'MainMenu');
-        
         setShowSidebar(key === 'Game');
         setShowGradientLine(key !== 'Game');
+        setShowHeader(key !== 'SignIn' && key !== 'SignUp');
     };
 
     return (
@@ -80,15 +82,17 @@ function App() {
              </aside>
             )}
 
-            <header className='header'>
-                <nav className='nav'>
-                    <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика для перехода */ }}>home</button>
-                    <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика */ }}>shop</button>
-                    <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика */ }}>discord</button>
-                    <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика */ }}>telegram</button>
-                </nav>
-                {showGradientLine && <div className="gradient-line"></div>}
-            </header>
+            {showHeader && (
+                <header className='header'>
+                    <nav className='nav'>
+                        <button className='nav-button'>home</button>
+                        <button className='nav-button'>shop</button>
+                        <button className='nav-button'>discord</button>
+                        <button className='nav-button'>telegram</button>
+                    </nav>
+                    {showGradientLine && <div className="gradient-line"></div>}
+                </header>
+            )}
 
             <FarmGame ref={phaserRef} currentActiveScene={currentScene} />
 
