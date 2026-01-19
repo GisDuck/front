@@ -82,10 +82,9 @@ function App() {
 
             <header className='header'>
                 <nav className='nav'>
-                    <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика для перехода */ }}>home</button>
+                    <button className='nav-button' onClick={(e) => { e.preventDefault(); phaserRef.current.scene.scene.start('MainMenu'); setShowSidebar(false); }}>home</button>
                     <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика */ }}>shop</button>
-                    <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика */ }}>discord</button>
-                    <button className='nav-button' onClick={(e) => { e.preventDefault(); /* логика */ }}>telegram</button>
+                    <button className='nav-button' onClick={(e) => { e.preventDefault(); window.location.assign('https://t.me/hzfarm_bot'); }}>telegram</button>
                 </nav>
                 {showGradientLine && <div className="gradient-line"></div>}
             </header>
