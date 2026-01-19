@@ -1,141 +1,82 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { onTelegramAuth as apiOnTelegramAuth } from "./request"; // путь подставьте свой
 
 export default function Dashboard() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Глобальная обёртка: виджет вызовет window.onTelegramAuth(user)
+    window.onTelegramAuth = async function (user) {
+      try {
+        // Можно показать loader/disable кнопки здесь
+        const res = await apiOnTelegramAuth(user);
+        if (res.ok) {
+          // Если на странице в query есть redirect — вернём туда, иначе в корень
+          const params = new URLSearchParams(window.location.search);
+          const redirectTo = params.get("redirect");
+          if (redirectTo) {
+            // Если redirect — используем window.location (полный переход) или navigate
+            window.location.href = redirectTo;
+          } else {
+            // Локальная навигация в SPA
+            navigate("/", { replace: true });
+          }
+        } else {
+          // Обработка ошибки от сервера — показать сообщение пользователю
+          console.error("Telegram auth failed", res);
+          alert("Не удалось войти через Telegram: " + (res.error?.message || res.status));
+        }
+      } catch (e) {
+        console.error("onTelegramAuth wrapper error", e);
+        alert("Ошибка при обработке входа через Telegram.");
+      }
+    };
+
+    // Динамически добавим скрипт Telegram-виджета
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.async = true;
+    // Параметры для виджета можно задать через data-атрибуты
+    script.setAttribute("data-telegram-login", "hzfarm_bot");
+    script.setAttribute("data-size", "large");
+    script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    script.setAttribute("data-request-access", "write");
+    // При необходимости добавьте data-userpic="false" и т.д.
+    const container = document.getElementById("telegram-widget-container");
+    if (container) container.appendChild(script);
+
+    return () => {
+      // cleanup: удалить скрипт и глобальную функцию
+      if (container) {
+        while (container.firstChild) container.removeChild(container.firstChild);
+      }
+      try {
+        delete window.onTelegramAuth;
+      } catch (_) {
+        window.onTelegramAuth = undefined;
+      }
+    };
+  }, [navigate]);
+
   return (
-    <div
-      style={{
-        background: 'url("/assets/sign_in.png") no-repeat center/cover',
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <div
-        style={{
-            backgroundColor: '#191919',       
-            padding: '10px',
-            borderRadius: '16px',
-            width: '250px',
-            height: '200px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
-            position: 'relative',
-            alignItems: 'center',
-
-            boxShadow: '0 0 40px 10px rgba(177, 66, 185, 0.5)',
-  }}
-        >
-
-    
-        <div
-        style={{
-            position: 'relative',
-            width: '100%',
-            height: '20px',
-            marginBottom: '12px',
-        }}
-        >
-        
-        <h2
-            style={{
-            position: 'absolute',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            margin: 0,
-            fontFamily: 'Bezier_Sans, sans-serif',
-            fontSize: '12px',
-            color: '#cccccc',
-            fontWeight: 'normal',
-            lineHeight: '20px',
-            whiteSpace: 'nowrap',
-            }}
-        >
-            log in or sign up
-        </h2>
-
-        <span
-            onClick={() => navigate(-1)}
-            style={{
-            position: 'absolute',
-            right: '5px',
-            top: '0',
-            fontSize: '12px',
-            cursor: 'pointer',
-            color: '#cccccc',
-            lineHeight: '20px',
-            }}
-        >
-            x
-        </span>
+    <div className="dashboard-root">
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-subtitle">log in or sign up</h2>
+          <span className="close-x" onClick={() => navigate(-1)}>x</span>
+        </div>
+        <h3 className="brand">HZF</h3>
+        <div className="actions">
+          <button className="btn outline">
+            <img className="btn-icon" src="/assets/telegram.png" alt="Telegram" />
+            telegram
+          </button>
         </div>
 
-        <h3 style={{ 
-            color: 'white', 
-            margin: 0,
-            fontSize: '55px', 
-            fontFamily: 'Bezier_Sans, sans-serif',
-            marginTop: '-30px',
-        }}
-            
-        >HZF</h3>
-
-        <div
-        style={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            marginTop: '-20px',
-            alignItems: 'center', 
-        }}
-        >
-                
-        <button
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '5px 5px',
-            width: '95%',
-            borderRadius: '15px',
-            border: '0.5px solid #cccccc',
-            backgroundColor: 'transparent',
-            color: '#cccccc',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontFamily: 'Bezier_Sans, sans-serif',
-        }}
-        >
-        <img src="/assets/telegram.png" alt="Telegram" style={{ width: 'auto', height: '20px', marginLeft: '5px'}} />
-        telegram
-        </button>
-
-        <button
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '5px 5px',
-            width: '95%',
-            borderRadius: '15px',
-            border: '0.5px solid #cccccc',
-            backgroundColor: 'transparent',
-            color: '#cccccc',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontFamily: 'Bezier_Sans, sans-serif',
-        }}
-         >
-        <img src="/assets/user.png" alt="More" style={{ width: 'auto', height: '18px', marginLeft: '5px' }} />
-        more options
-        </button>
+        {/* Контейнер для Telegram-виджета */}
+        <div id="telegram-widget-container" style={{ marginTop: 16 }}></div>
       </div>
     </div>
-</div>
   );
 }

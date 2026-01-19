@@ -1,4 +1,4 @@
-function getCookie(name) {
+export function getCookie(name) {
     const cookies = document.cookie ? document.cookie.split("; ") : [];
     for (const cookie of cookies) {
         const [key, ...rest] = cookie.split("=");
@@ -9,18 +9,18 @@ function getCookie(name) {
     return null;
 }
 
-function getCsrfToken() {
+export function getCsrfToken() {
     return getCookie("XSRF-TOKEN");
 }
 
-function generateIdempotencyKey() {
+export function generateIdempotencyKey() {
     if (window.crypto && window.crypto.randomUUID) {
         return window.crypto.randomUUID();
     }
     return "idem-" + Date.now() + "-" + Math.random().toString(16).slice(2);
 }
 
-async function callGraphQL(query, variables, description) {
+export async function callGraphQL(query, variables, description) {
     const key = generateIdempotencyKey();
     const csrf = getCsrfToken();
 
@@ -43,7 +43,7 @@ async function callGraphQL(query, variables, description) {
     };
 
     try {
-        const resp = await fetch("/graphql", {
+        const resp = await fetch("https://hzfarm.ru/api", {
             method: "POST",
             headers: headers,
             credentials: "include",
@@ -78,8 +78,8 @@ async function callGraphQL(query, variables, description) {
     }
 }
 
-async function postAuthRefresh() {
-    const res = await fetch('/auth/refresh', {
+export async function postAuthRefresh() {
+    const res = await fetch('https://hzfarm.ru/api/auth/refresh', {
         method: 'POST',
         credentials: 'include'
     });
@@ -87,8 +87,8 @@ async function postAuthRefresh() {
     return res;
 }
 
-async function postAuthLogout() {
-    const res = await fetch('/auth/logout', {
+export async function postAuthLogout() {
+    const res = await fetch('https://hzfarm.ru/api/auth/logout', {
         method: 'POST',
         credentials: 'include'
     });
@@ -96,24 +96,23 @@ async function postAuthLogout() {
     return res;
 }
 
-async function onTelegramAuth(user) {
+export async function onTelegramAuth(user) {
     try {
-        const resp = await fetch("/auth/telegram-login", {
+        const resp = await fetch("https://hzfarm.ru/api/auth/telegram-login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify(user)
         });
-
         if (resp.ok) {
-            //            Делаем когда логин удачный
+            const data = await resp.json().catch(()=>null);
+            return { ok: true, data, status: resp.status };
         } else {
-            //            Делаем когда с сервера пришел ответ не ок
+            const err = await resp.json().catch(()=>null);
+            return { ok: false, status: resp.status, error: err };
         }
     } catch (e) {
-        //        Делаем если вдруг совсем сломалось
+        return { ok: false, status: 0, error: String(e) };
     }
 }
 
