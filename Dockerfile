@@ -1,26 +1,16 @@
-# syntax=docker/dockerfile:1
+FROM node:20-alpine
 
-FROM node:20-alpine AS build
 WORKDIR /app
 
-# зависимости
+# Устанавливаем зависимости
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# исходники
+# Копируем проект
 COPY . .
 
-# важный момент: используем build-nolog (у тебя он есть), чтобы не зависеть от внешнего log.js
-RUN npm run build-nolog
+# Vite dev-server (обычно 5173, но у тебя может отличаться)
+EXPOSE 5173
 
-# --- runtime ---
-FROM nginx:1.27-alpine AS runtime
-
-# конфиг nginx под SPA
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# статика
-COPY --from=build /app/dist/ /usr/share/nginx/html/
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Запуск без сборки, в dev-режиме, с доступом извне контейнера
+CMD ["sh", "-lc", "node log.js dev & vite --config vite/config.dev.mjs --host 0.0.0.0 --port 5173"]
