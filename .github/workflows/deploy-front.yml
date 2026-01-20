@@ -55,4 +55,4 @@ jobs:
             set -e
             cd app
             docker compose down front
-            docker compose up front
+            docker compose up -d
