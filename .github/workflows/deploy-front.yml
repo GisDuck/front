@@ -44,16 +44,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           target: app/front
           source: |
-            Dockerfile
-            nginx.conf
-            .dockerignore
-            package.json
-            package-lock.json
-            index.html
-            log.js
-            public/**
-            src/**
-            vite/**
+            "Dockerfile",
+            "nginx.conf",
+            ".dockerignore",
+            "package.json",
+            "package-lock.json",
+            "index.html",
+            "log.js",
+            "public/**",
+            "src/**",
+            "vite/**"
 
       - name: Rebuild and restart front container
         uses: appleboy/ssh-action@v0.1.10
